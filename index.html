@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember &amp; Oat — Coffee House</title>
+<meta name="description" content="Ember & Oat is a neighborhood coffee house serving slow-roasted coffee, fresh pastries and all-day brunch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f5ede2;
+    --paper:#fbf7f1;
+    --espresso:#2a1c15;
+    --roast:#5a3a2a;
+    --ember:#c9603a;
+    --ember-soft:#e9a07e;
+    --sage:#8a9a7b;
+    --line:rgba(42,28,21,.14);
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'DM Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--cream);color:var(--espresso);line-height:1.6;overflow-x:hidden}
+  img,svg{display:block}
+  a{color:inherit}
+
+  /* ---------- NAV ---------- */
+  nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+      padding:18px 6vw;transition:background .4s, box-shadow .4s, padding .4s}
+  nav.scrolled{background:rgba(245,237,226,.92);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--line);padding:12px 6vw}
+  .nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:1.15rem;text-decoration:none;
+             opacity:0;transition:opacity .4s}
+  nav.scrolled .nav-brand{opacity:1}
+  .nav-brand svg{width:30px;height:30px}
+  .nav-links{display:flex;gap:28px;list-style:none}
+  .nav-links a{text-decoration:none;font-weight:500;font-size:.95rem;position:relative}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--ember);transition:width .3s}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{background:var(--espresso);color:var(--cream)!important;padding:8px 16px;border-radius:999px}
+  .nav-cta::after{display:none}
+  .menu-toggle{display:none;background:none;border:0;cursor:pointer;width:32px;height:32px}
+  .menu-toggle span{display:block;height:2px;background:var(--espresso);margin:6px 0;transition:.3s}
+
+  /* ---------- HERO ---------- */
+  .hero{min-height:100vh;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden;padding:100px 6vw 60px}
+  .hero::before{content:"";position:absolute;width:120vmax;height:120vmax;border-radius:50%;
+      background:radial-gradient(circle, rgba(233,160,126,.35) 0%, rgba(245,237,226,0) 55%);top:50%;left:50%;transform:translate(-50%,-50%)}
+  .hero-inner{position:relative;z-index:1}
+  .logo-wrap{width:min(220px,46vw);margin:0 auto 28px;position:relative}
+  .logo-wrap svg{width:100%;height:auto}
+  .logo-ring{stroke-dasharray:640;stroke-dashoffset:640;animation:draw 1.8s .2s cubic-bezier(.6,.1,.2,1) forwards}
+  .logo-cup{opacity:0;transform:translateY(14px);transform-box:fill-box;animation:rise .9s 1s ease-out forwards}
+  .steam path{stroke-dasharray:60;stroke-dashoffset:60;animation:steamIn 1s 1.6s ease-out forwards, steamFloat 3.2s 2.6s ease-in-out infinite}
+  .steam path:nth-child(2){animation-delay:1.8s, 2.9s}
+  .steam path:nth-child(3){animation-delay:2s, 3.2s}
+  .logo-text{opacity:0;animation:fade 1s 1.3s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes rise{to{opacity:1;transform:none}}
+  @keyframes fade{to{opacity:1}}
+  @keyframes steamIn{to{stroke-dashoffset:0}}
+  @keyframes steamFloat{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(-6px);opacity:.55}}
+
+  .hero h1{font-family:var(--serif);font-weight:800;font-size:clamp(3rem,10vw,7.5rem);line-height:.95;letter-spacing:-.02em}
+  .hero h1 .word{display:inline-block;opacity:0;transform:translateY(40px);animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards}
+  .hero h1 .word:nth-child(1){animation-delay:1.4s}
+  .hero h1 .word:nth-child(2){animation-delay:1.55s;color:var(--ember);font-style:italic;font-weight:400}
+  .hero h1 .word:nth-child(3){animation-delay:1.7s}
+  .tagline{margin:22px auto 0;max-width:460px;font-size:1.1rem;color:var(--roast);opacity:0;animation:fade 1s 2.1s forwards}
+  .hero-actions{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fade 1s 2.4s forwards}
+  .btn{display:inline-block;padding:14px 28px;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .25s, box-shadow .25s, background .25s}
+  .btn-primary{background:var(--ember);color:#fff;box-shadow:0 10px 24px -10px var(--ember)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -12px var(--ember)}
+  .btn-ghost{border:2px solid var(--espresso)}
+  .btn-ghost:hover{background:var(--espresso);color:var(--cream)}
+  .scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--roast);opacity:0;animation:fade 1s 3s forwards;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .scroll-hint i{width:2px;height:36px;background:linear-gradient(var(--roast),transparent);animation:drip 1.8s infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- MARQUEE ---------- */
+  .marquee{background:var(--espresso);color:var(--cream);overflow:hidden;padding:18px 0;white-space:nowrap}
+  .marquee-track{display:inline-flex;gap:48px;animation:slide 28s linear infinite;font-family:var(--serif);font-size:1.4rem;font-style:italic}
+  .marquee-track span::after{content:"✦";margin-left:48px;color:var(--ember-soft);font-style:normal}
+  @keyframes slide{to{transform:translateX(-50%)}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:110px 6vw}
+  .eyebrow{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ember);font-weight:700}
+  .section-title{font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.05;margin:10px 0 18px;font-weight:600}
+  .section-lead{max-width:540px;color:var(--roast)}
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(50px);transition:opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- MENU ---------- */
+  #menu{background:var(--paper)}
+  .menu-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:46px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{font:inherit;font-weight:500;border:1.5px solid var(--line);background:transparent;padding:10px 20px;border-radius:999px;cursor:pointer;transition:.25s;color:var(--espresso)}
+  .tab:hover{border-color:var(--espresso)}
+  .tab.active{background:var(--espresso);color:var(--cream);border-color:var(--espresso)}
+  .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:26px}
+  .item{background:var(--cream);border-radius:22px;overflow:hidden;position:relative;
+        opacity:0;transform:translateY(60px) rotate(-1.5deg) scale(.96);
+        transition:opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1), box-shadow .3s}
+  .item.in{opacity:1;transform:none}
+  .item.in:hover{transform:translateY(-6px);box-shadow:0 24px 40px -24px rgba(42,28,21,.45)}
+  .item-art{aspect-ratio:4/3;display:grid;place-items:center;position:relative;overflow:hidden}
+  .item-art svg{width:46%;height:auto;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .item:hover .item-art svg{transform:scale(1.1) rotate(-4deg)}
+  .item-body{padding:20px 22px 24px}
+  .item-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .item h3{font-family:var(--serif);font-size:1.35rem;font-weight:600}
+  .price{font-weight:700;color:var(--ember);white-space:nowrap}
+  .item p{color:var(--roast);font-size:.93rem;margin-top:6px}
+  .badge{position:absolute;top:14px;left:14px;background:var(--espresso);color:var(--cream);font-size:.72rem;font-weight:700;letter-spacing:.08em;
+         text-transform:uppercase;padding:5px 11px;border-radius:999px;z-index:2}
+  .item.hide{display:none}
+
+  /* ---------- STORY ---------- */
+  .story{display:grid;grid-template-columns:1.1fr 1fr;gap:70px;align-items:center}
+  .story-art{position:relative;aspect-ratio:1;border-radius:32px;background:var(--espresso);overflow:hidden}
+  .story-art .bean{position:absolute;width:70px;height:96px;border-radius:50%;background:var(--roast);transform:rotate(var(--r));
+                   box-shadow:inset -8px -6px 0 rgba(0,0,0,.25)}
+  .story-art .bean::after{content:"";position:absolute;left:50%;top:10%;bottom:10%;width:6px;margin-left:-3px;border-radius:6px;background:var(--espresso)}
+  .story-art .stamp{position:absolute;inset:0;display:grid;place-items:center}
+  .story-art .stamp div{width:58%;aspect-ratio:1;border-radius:50%;background:var(--ember);color:var(--cream);display:grid;place-items:center;text-align:center;
+       font-family:var(--serif);font-size:clamp(1.2rem,2.4vw,1.9rem);line-height:1.1;padding:20px;transform:rotate(-8deg);box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+  .stats{display:flex;gap:40px;margin-top:34px;flex-wrap:wrap}
+  .stat b{display:block;font-family:var(--serif);font-size:2.6rem;color:var(--ember);line-height:1}
+  .stat span{font-size:.88rem;color:var(--roast)}
+
+  /* ---------- GALLERY STRIP ---------- */
+  .moments{padding:0 0 110px}
+  .moments-track{display:flex;gap:22px;padding:0 6vw;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .moments-track::-webkit-scrollbar{display:none}
+  .moment{flex:0 0 min(320px,78vw);aspect-ratio:3/4;border-radius:26px;scroll-snap-align:start;position:relative;overflow:hidden;
+          display:flex;align-items:flex-end;padding:24px;color:var(--cream)}
+  .moment h4{font-family:var(--serif);font-size:1.6rem;font-weight:600;position:relative;z-index:1}
+  .moment p{font-size:.9rem;opacity:.85;position:relative;z-index:1}
+  .moment::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%, rgba(0,0,0,.45))}
+  .m1{background:radial-gradient(circle at 30% 30%, #e9a07e, #c9603a 60%, #7a3520)}
+  .m2{background:radial-gradient(circle at 70% 20%, #b8c4a8, #8a9a7b 55%, #4c5a42)}
+  .m3{background:radial-gradient(circle at 40% 70%, #8b6450, #5a3a2a 55%, #2a1c15)}
+  .m4{background:radial-gradient(circle at 60% 40%, #f2d3a8, #d9a35f 60%, #8f5e24)}
+  .moment .deco{position:absolute;top:22px;right:22px;width:64px;height:64px;opacity:.9}
+
+  /* ---------- VISIT ---------- */
+  #visit{background:var(--espresso);color:var(--cream)}
+  #visit .section-lead{color:rgba(245,237,226,.75)}
+  .visit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px}
+  .card{border:1px solid rgba(245,237,226,.18);border-radius:22px;padding:30px}
+  .card h3{font-family:var(--serif);font-weight:600;font-size:1.4rem;margin-bottom:14px;color:var(--ember-soft)}
+  .hours{list-style:none}
+  .hours li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed rgba(245,237,226,.18)}
+  .hours li:last-child{border:0}
+  .open-now{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:.9rem;font-weight:500}
+  .open-now i{width:9px;height:9px;border-radius:50%;background:#7fd18b;box-shadow:0 0 0 0 rgba(127,209,139,.7);animation:pulse 2s infinite}
+  .open-now.closed i{background:#e07a6a;animation:none}
+  @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(127,209,139,0)}100%{box-shadow:0 0 0 0 rgba(127,209,139,0)}}
+  .card a.btn{margin-top:20px}
+  .btn-light{background:var(--cream);color:var(--espresso)}
+  .btn-light:hover{transform:translateY(-2px)}
+
+  footer{background:#1f150f;color:rgba(245,237,226,.6);padding:34px 6vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.88rem}
+  footer strong{color:var(--cream);font-family:var(--serif);font-weight:600}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:860px){
+    .story{grid-template-columns:1fr;gap:44px}
+    .visit-grid{grid-template-columns:1fr}
+    .menu-toggle{display:block}
+    .nav-links{position:fixed;inset:0 0 auto 0;top:0;flex-direction:column;align-items:center;gap:22px;padding:90px 0 40px;
+               background:var(--cream);transform:translateY(-110%);transition:transform .45s cubic-bezier(.2,.8,.2,1);box-shadow:0 20px 40px -20px rgba(0,0,0,.3)}
+    .nav-links.open{transform:none}
+    .nav-links a{font-size:1.2rem}
+    .menu-toggle{position:relative;z-index:2}
+    .menu-toggle.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+    .menu-toggle.open span:nth-child(2){opacity:0}
+    .menu-toggle.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+    section{padding:80px 6vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
+    .reveal,.item{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- Reusable logo mark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 220 220">
+    <circle cx="110" cy="110" r="100" fill="none" stroke="currentColor" stroke-width="5"/>
+    <path d="M70 108h70v18a35 35 0 0 1-35 35 35 35 0 0 1-35-35z" fill="#c9603a"/>
+    <path d="M140 114h8a14 14 0 0 1 0 28h-10" fill="none" stroke="#c9603a" stroke-width="7" stroke-linecap="round"/>
+    <path d="M60 170h100" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <path d="M90 92c-8-10 8-16 0-28M108 92c-8-10 8-16 0-28M126 92c-8-10 8-16 0-28" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<nav id="nav">
+  <a href="#top" class="nav-brand"><svg><use href="#mark"/></svg>Ember &amp; Oat</a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#visit">Visit</a></li>
+    <li><a href="#visit" class="nav-cta">Order Ahead</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div class="logo-wrap" aria-hidden="true">
+      <svg viewBox="0 0 220 220">
+        <circle class="logo-ring" cx="110" cy="110" r="100" fill="none" stroke="#2a1c15" stroke-width="5"/>
+        <defs><path id="arc" d="M110 196a86 86 0 1 1 0.01 0"/></defs>
+        <text class="logo-text" font-family="DM Sans, sans-serif" font-size="12" font-weight="700" letter-spacing="4" fill="#5a3a2a">
+          <textPath href="#arc" startOffset="50%" text-anchor="middle">EST. 2026 · SLOW ROASTED</textPath>
+        </text>
+        <g class="logo-cup">
+          <path d="M70 108h70v18a35 35 0 0 1-35 35 35 35 0 0 1-35-35z" fill="#c9603a"/>
+          <path d="M140 114h8a14 14 0 0 1 0 28h-10" fill="none" stroke="#c9603a" stroke-width="7" stroke-linecap="round"/>
+          <path d="M60 172h100" stroke="#2a1c15" stroke-width="6" stroke-linecap="round"/>
+        </g>
+        <g class="steam" fill="none" stroke="#2a1c15" stroke-width="5" stroke-linecap="round">
+          <path d="M90 96c-8-10 8-16 0-28"/>
+          <path d="M108 96c-8-10 8-16 0-28"/>
+          <path d="M126 96c-8-10 8-16 0-28"/>
+        </g>
+      </svg>
+    </div>
+    <h1><span class="word">Ember</span> <span class="word">&amp;</span> <span class="word">Oat</span></h1>
+    <p class="tagline">Slow-roasted coffee, warm pastries and an all-day brunch, made fresh every morning.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn btn-primary">See the Menu</a>
+      <a href="#visit" class="btn btn-ghost">Find Us</a>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll<i></i></div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Freshly roasted beans</span><span>Pastries baked at 6am</span><span>Oat milk, always free</span><span>All-day brunch</span>
+    <span>Freshly roasted beans</span><span>Pastries baked at 6am</span><span>Oat milk, always free</span><span>All-day brunch</span>
+  </div>
+</div>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="menu-head">
+    <div class="reveal">
+      <p class="eyebrow">Our Menu</p>
+      <h2 class="section-title">Made slowly,<br>served warm.</h2>
+      <p class="section-lead">Everything is prepared in-house, from our single-origin espresso to the sourdough we bake every morning.</p>
+    </div>
+    <div class="tabs reveal" role="tablist">
+      <button class="tab active" data-filter="all">All</button>
+      <button class="tab" data-filter="coffee">Coffee</button>
+      <button class="tab" data-filter="tea">Tea &amp; More</button>
+      <button class="tab" data-filter="bakery">Bakery</button>
+      <button class="tab" data-filter="brunch">Brunch</button>
+    </div>
+  </div>
+
+  <div class="menu-grid" id="menuGrid"></div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="story">
+    <div class="story-art reveal" aria-hidden="true">
+      <span class="bean" style="top:8%;left:10%;--r:20deg"></span>
+      <span class="bean" style="top:14%;right:12%;--r:-30deg"></span>
+      <span class="bean" style="bottom:12%;left:16%;--r:60deg"></span>
+      <span class="bean" style="bottom:8%;right:18%;--r:-10deg"></span>
+      <span class="bean" style="top:44%;left:-4%;--r:80deg"></span>
+      <span class="bean" style="top:40%;right:-3%;--r:15deg"></span>
+      <div class="stamp"><div>Roasted<br>in small<br>batches</div></div>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow">Our Story</p>
+      <h2 class="section-title">A little corner for slow mornings.</h2>
+      <p class="section-lead">Ember &amp; Oat started with one roaster, one oven and a simple idea: a café where nobody rushes you. We roast our beans in small batches, bake everything on site and still know most of our regulars by name.</p>
+      <div class="stats">
+        <div class="stat"><b data-count="12">0</b><span>coffee origins</span></div>
+        <div class="stat"><b data-count="40">0</b><span>pastries baked daily</span></div>
+        <div class="stat"><b data-count="4.9" data-decimals="1">0</b><span>average rating</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MOMENTS -->
+<div class="moments">
+  <div class="moments-track reveal">
+    <div class="moment m1"><svg class="deco" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3"><circle cx="32" cy="32" r="22"/><path d="M22 32c6-8 14-8 20 0"/></svg><div><h4>Latte art mornings</h4><p>Every cup poured by hand.</p></div></div>
+    <div class="moment m2"><svg class="deco" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3"><path d="M32 54V24M32 34c-10 0-14-8-14-14 8 0 14 4 14 14zM32 30c10 0 14-8 14-14-8 0-14 4-14 14z"/></svg><div><h4>Garden seating</h4><p>Sunny tables out back.</p></div></div>
+    <div class="moment m3"><svg class="deco" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3"><rect x="14" y="20" width="36" height="26" rx="4"/><path d="M22 20v-6h20v6"/></svg><div><h4>Work-friendly</h4><p>Fast Wi-Fi, plenty of outlets.</p></div></div>
+    <div class="moment m4"><svg class="deco" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3"><path d="M12 40c0-12 10-20 20-20s20 8 20 20z"/><path d="M8 44h48"/></svg><div><h4>Fresh at 6am</h4><p>Croissants straight from the oven.</p></div></div>
+  </div>
+</div>
+
+<!-- VISIT -->
+<section id="visit">
+  <div class="reveal">
+    <p class="eyebrow" style="color:var(--ember-soft)">Visit Us</p>
+    <h2 class="section-title">Come say hello.</h2>
+    <p class="section-lead">Walk in, order ahead, or book a table for a group. We'd love to make your next coffee.</p>
+  </div>
+  <div class="visit-grid">
+    <div class="card reveal">
+      <h3>Opening Hours</h3>
+      <ul class="hours">
+        <li><span>Mon – Fri</span><span>7:00 – 19:00</span></li>
+        <li><span>Saturday</span><span>8:00 – 20:00</span></li>
+        <li><span>Sunday</span><span>8:00 – 17:00</span></li>
+      </ul>
+      <div class="open-now" id="openNow"><i></i><span>Checking…</span></div>
+    </div>
+    <div class="card reveal">
+      <h3>Find Us</h3>
+      <p>88 Maple Lane<br>Riverside District<br>Your City</p>
+      <a class="btn btn-light" href="https://maps.google.com" target="_blank" rel="noopener">Get Directions</a>
+    </div>
+    <div class="card reveal">
+      <h3>Get in Touch</h3>
+      <p>hello@emberandoat.example<br>+00 123 456 789</p>
+      <a class="btn btn-primary" href="#">Order Ahead</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span><strong>Ember &amp; Oat</strong> · Coffee House</span>
+  <span>Demo website. Café and details are fictional.</span>
+</footer>
+
+<script>
+/* ---------- MENU DATA (edit items here) ---------- */
+const menu = [
+  {cat:"coffee", name:"Ember Latte", price:"$4.80", desc:"Double espresso, steamed oat milk, a hint of brown-sugar caramel.", art:"latte", bg:"#f0d9c4", badge:"Signature"},
+  {cat:"coffee", name:"Flat White", price:"$4.20", desc:"Silky microfoam over a ristretto shot. Small and strong.", art:"cup", bg:"#e8d3bf"},
+  {cat:"coffee", name:"Cold Brew", price:"$4.50", desc:"Steeped for 18 hours. Smooth, chocolatey, never bitter.", art:"iced", bg:"#d8c7b3"},
+  {cat:"tea", name:"Matcha Cloud", price:"$5.20", desc:"Ceremonial matcha whisked with honey and foamed milk.", art:"matcha", bg:"#d9e0cc", badge:"New"},
+  {cat:"tea", name:"Spiced Chai", price:"$4.60", desc:"House-made masala blend, cinnamon, cardamom and ginger.", art:"cup", bg:"#efd2b8"},
+  {cat:"bakery", name:"Butter Croissant", price:"$3.40", desc:"Laminated over three days. Flaky, golden, still warm.", art:"croissant", bg:"#f3dfb9"},
+  {cat:"bakery", name:"Cinnamon Knot", price:"$3.80", desc:"Brioche twisted with cinnamon sugar and orange zest.", art:"bun", bg:"#ecd0b0"},
+  {cat:"brunch", name:"Avocado Sourdough", price:"$9.50", desc:"Smashed avocado, chili oil, soft egg, toasted seeds.", art:"toast", bg:"#dde3cf"},
+  {cat:"brunch", name:"Fluffy Pancakes", price:"$10.20", desc:"Three buttermilk pancakes, berries, maple and whipped butter.", art:"pancake", bg:"#f2dcc0", badge:"Popular"}
+];
+
+const art = {
+  latte:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="86" rx="36" ry="6" fill="#2a1c15" opacity=".15"/><path d="M20 40h60l-6 40a8 8 0 0 1-8 7H34a8 8 0 0 1-8-7z" fill="#fbf7f1"/><ellipse cx="50" cy="40" rx="30" ry="7" fill="#b07a55"/><path d="M42 39c4-6 12-6 16 0-4 3-12 3-16 0z" fill="#fbf7f1"/><path d="M80 48h4a8 8 0 0 1 0 16h-6" fill="none" stroke="#fbf7f1" stroke-width="5"/></svg>`,
+  cup:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="86" rx="38" ry="6" fill="#2a1c15" opacity=".15"/><ellipse cx="50" cy="80" rx="38" ry="7" fill="#fbf7f1"/><path d="M24 46h52v12a26 26 0 0 1-52 0z" fill="#c9603a"/><ellipse cx="50" cy="46" rx="26" ry="5" fill="#6b4230"/><path d="M76 52h4a8 8 0 0 1 0 16h-6" fill="none" stroke="#c9603a" stroke-width="5"/><path d="M42 36c-4-5 4-8 0-14M56 36c-4-5 4-8 0-14" stroke="#5a3a2a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  iced:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="90" rx="24" ry="5" fill="#2a1c15" opacity=".15"/><path d="M28 24h44l-6 62H34z" fill="#fff" opacity=".6"/><path d="M31 42h38l-4 44H35z" fill="#5a3a2a"/><rect x="38" y="46" width="10" height="10" rx="2" fill="#fff" opacity=".7" transform="rotate(12 43 51)"/><rect x="52" y="54" width="10" height="10" rx="2" fill="#fff" opacity=".6" transform="rotate(-10 57 59)"/><path d="M56 10l-4 40" stroke="#c9603a" stroke-width="4" stroke-linecap="round"/></svg>`,
+  matcha:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="86" rx="34" ry="6" fill="#2a1c15" opacity=".15"/><path d="M18 46h64c0 22-14 38-32 38S18 68 18 46z" fill="#fbf7f1"/><ellipse cx="50" cy="46" rx="32" ry="7" fill="#8a9a7b"/><path d="M38 45c6-4 18-4 24 0" stroke="#d9e0cc" stroke-width="3" fill="none"/></svg>`,
+  croissant:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="78" rx="38" ry="6" fill="#2a1c15" opacity=".15"/><path d="M12 62c8-22 24-34 38-34s30 12 38 34c-8 4-16 2-22-4-4 6-10 8-16 8s-12-2-16-8c-6 6-14 8-22 4z" fill="#d9a35f"/><path d="M34 40c4 10 4 18 0 26M50 30v34M66 40c-4 10-4 18 0 26" stroke="#8f5e24" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  bun:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="80" rx="34" ry="6" fill="#2a1c15" opacity=".15"/><circle cx="50" cy="52" r="28" fill="#c98a4b"/><path d="M50 52m-18 0a18 18 0 1 0 18-18 10 10 0 1 0 8 14" fill="none" stroke="#7a4a20" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="34" r="2" fill="#fbf7f1"/><circle cx="64" cy="40" r="2" fill="#fbf7f1"/><circle cx="60" cy="68" r="2" fill="#fbf7f1"/></svg>`,
+  toast:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="84" rx="38" ry="6" fill="#2a1c15" opacity=".15"/><path d="M18 40c0-14 14-20 32-20s32 6 32 20v38H18z" fill="#d9a35f"/><path d="M24 44c0-10 10-14 26-14s26 4 26 14v28H24z" fill="#f3dfb9"/><path d="M28 50c8-6 36-6 44 0v16H28z" fill="#8a9a7b"/><circle cx="50" cy="56" r="9" fill="#fbf7f1"/><circle cx="50" cy="56" r="4.5" fill="#e9a03a"/></svg>`,
+  pancake:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="84" rx="40" ry="6" fill="#2a1c15" opacity=".15"/><ellipse cx="50" cy="76" rx="36" ry="8" fill="#d9a35f"/><ellipse cx="50" cy="66" rx="34" ry="8" fill="#e6b574"/><ellipse cx="50" cy="56" rx="32" ry="8" fill="#d9a35f"/><path d="M26 54c8 6 40 6 48 0 0 6-4 14-8 16-2-6-6-8-8-2-8 2-20 0-26-6z" fill="#8f3f20" opacity=".8"/><rect x="42" y="42" width="16" height="10" rx="2" fill="#fbf2c8"/><circle cx="34" cy="48" r="4" fill="#c9603a"/><circle cx="66" cy="46" r="4" fill="#5a3a7a"/></svg>`
+};
+
+const grid = document.getElementById('menuGrid');
+grid.innerHTML = menu.map(m => `
+  <article class="item" data-cat="${m.cat}">
+    ${m.badge ? `<span class="badge">${m.badge}</span>` : ''}
+    <div class="item-art" style="background:${m.bg}">${art[m.art]}</div>
+    <div class="item-body">
+      <div class="item-row"><h3>${m.name}</h3><span class="price">${m.price}</span></div>
+      <p>${m.desc}</p>
+    </div>
+  </article>`).join('');
+
+/* ---------- SCROLL REVEAL ---------- */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    if (el.classList.contains('item')) {
+      const visible = [...grid.querySelectorAll('.item:not(.hide)')];
+      el.style.transitionDelay = (visible.indexOf(el) % 3) * 0.12 + 's';
+    }
+    el.classList.add('in');
+    el.querySelectorAll('[data-count]').forEach(countUp);
+    io.unobserve(el);
+  });
+}, {threshold: 0.15, rootMargin: '0px 0px -40px 0px'});
+document.querySelectorAll('.reveal, .item').forEach(el => io.observe(el));
+
+/* ---------- MENU FILTER ---------- */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const f = tab.dataset.filter;
+    let i = 0;
+    grid.querySelectorAll('.item').forEach(item => {
+      const show = f === 'all' || item.dataset.cat === f;
+      item.classList.remove('in');
+      item.classList.toggle('hide', !show);
+      if (show) {
+        item.style.transitionDelay = (i++ * 0.08) + 's';
+        requestAnimationFrame(() => requestAnimationFrame(() => item.classList.add('in')));
+      }
+    });
+  });
+});
+
+/* ---------- COUNTERS ---------- */
+function countUp(el){
+  const target = parseFloat(el.dataset.count), dec = +(el.dataset.decimals || 0), start = performance.now(), dur = 1400;
+  (function tick(now){
+    const p = Math.min((now - start) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = (target * eased).toFixed(dec);
+    if (p < 1) requestAnimationFrame(tick);
+  })(start);
+}
+
+/* ---------- NAV ---------- */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60), {passive:true});
+const toggle = document.getElementById('menuToggle'), links = document.getElementById('navLinks');
+toggle.addEventListener('click', () => { toggle.classList.toggle('open'); links.classList.toggle('open'); });
+links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { toggle.classList.remove('open'); links.classList.remove('open'); }));
+
+/* ---------- OPEN NOW ---------- */
+(function(){
+  const d = new Date(), day = d.getDay(), h = d.getHours() + d.getMinutes() / 60;
+  const [o, c] = day === 0 ? [8, 17] : day === 6 ? [8, 20] : [7, 19];
+  const el = document.getElementById('openNow'), open = h >= o && h < c;
+  el.classList.toggle('closed', !open);
+  el.querySelector('span').textContent = open ? 'Open now' : 'Closed now · opens at ' + o + ':00';
+})();
+</script>
+</body>
+</html>
